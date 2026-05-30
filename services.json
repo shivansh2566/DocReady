@@ -1,0 +1,11 @@
+{
+  "_note": "This file is a reference copy of the service data used in app.js. For the current PoC, data lives inside app.js. In a future Flask backend, this JSON will be served via an API endpoint.",
+  "services": [
+    {"id": "passport",  "icon": "🛂", "name": "Passport",           "desc": "Fresh / Renewal",     "badge": "",           "needsState": false},
+    {"id": "dl",        "icon": "🪪", "name": "Driving Licence",    "desc": "New / Renewal",        "badge": "",           "needsState": false},
+    {"id": "ration",    "icon": "🏠", "name": "Ration Card",         "desc": "New / Update",         "badge": "State-wise", "needsState": true},
+    {"id": "voterid",   "icon": "🗳️", "name": "Voter ID",            "desc": "New / Correction",     "badge": "",           "needsState": false},
+    {"id": "income",    "icon": "📄", "name": "Income Certificate",  "desc": "For self or family",   "badge": "",           "needsState": false},
+    {"id": "caste",     "icon": "📜", "name": "Caste Certificate",   "desc": "SC / ST / OBC / EWS",  "badge": "",           "needsState": false}
+  ]
+}
