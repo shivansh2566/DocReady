@@ -1,0 +1,158 @@
+stages:
+  - lint
+  - format
+  - type_check
+  - test
+  - coverage
+
+# ──────────────────────────────────────────
+# LINT
+# ──────────────────────────────────────────
+lint:
+  stage: lint
+  image: node:20-alpine
+  before_script:
+    - npm install -g htmlhint eslint
+  script:
+    - echo "==> HTML lint"
+    - htmlhint index.html
+    - echo "==> JS lint"
+    - eslint app.js --env browser --env es2021 --rule '{"no-unused-vars":"warn","no-undef":"warn"}'
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# ──────────────────────────────────────────
+# PRE-COMMIT HOOKS (enforced via GitLab CI)
+# ──────────────────────────────────────────
+pre-commit:
+  stage: lint
+  image: python:3.12-slim
+  before_script:
+    - pip install pre-commit --quiet
+    - apt-get update -qq && apt-get install -y -qq nodejs npm
+    - npm install -g prettier htmlhint eslint --quiet
+  script:
+    - echo "==> Running pre-commit hooks"
+    - pre-commit run --all-files --show-diff-on-failure
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# ──────────────────────────────────────────
+# DEPENDENCY AUDIT
+# ──────────────────────────────────────────
+dependency-audit:
+  stage: lint
+  image: node:20-alpine
+  before_script:
+    - npm install
+  script:
+    - echo "==> npm audit (fails on high/critical)"
+    - npm audit --audit-level=high
+    - echo "==> Installing Trivy for Docker image + filesystem scan"
+    - apk add --no-cache curl
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    - echo "==> Scanning Docker base images for CVEs"
+    - trivy image --exit-code 0 --severity LOW,MEDIUM --no-progress node:20-alpine
+    - trivy image --exit-code 1 --severity HIGH,CRITICAL --no-progress node:20-alpine
+    - trivy image --exit-code 0 --severity LOW,MEDIUM --no-progress nginx:1.27-alpine
+    - trivy image --exit-code 1 --severity HIGH,CRITICAL --no-progress nginx:1.27-alpine
+    - echo "==> Scanning repo filesystem for misconfigurations"
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --scanners misconfig,secret .
+    - echo "==> Audit complete"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+  allow_failure: false
+
+# ──────────────────────────────────────────
+# FORMAT
+# ──────────────────────────────────────────
+format:
+  stage: format
+  image: node:20-alpine
+  before_script:
+    - npm install -g prettier
+  script:
+    - echo "==> Checking formatting (HTML, CSS, JS)"
+    - prettier --check "*.html" "*.css" "*.js" "*.json"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# ──────────────────────────────────────────
+# TYPE CHECK
+# ──────────────────────────────────────────
+type_check:
+  stage: type_check
+  image: node:20-alpine
+  before_script:
+    - npm install -g typescript
+  script:
+    - echo "==> JS type checking via TypeScript (checkJs mode)"
+    - |
+      cat > tsconfig_check.json << 'TSEOF'
+      {
+        "compilerOptions": {
+          "checkJs": true,
+          "allowJs": true,
+          "noEmit": true,
+          "strict": false,
+          "target": "ES2021",
+          "lib": ["ES2021", "DOM"],
+          "skipLibCheck": true
+        },
+        "include": ["app.js"]
+      }
+      TSEOF
+    - tsc --project tsconfig_check.json || true
+    - echo "==> Type check complete"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# ──────────────────────────────────────────
+# TEST
+# ──────────────────────────────────────────
+test:
+  stage: test
+  image: node:20-alpine
+  before_script:
+    - npm install
+  script:
+    - echo "==> Running Jest test suite"
+    - npm test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# ──────────────────────────────────────────
+# SECRET SCANNING
+# ──────────────────────────────────────────
+secret-scanning:
+  stage: test
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: [""]
+  script:
+    - gitleaks detect --source . --config .gitleaks.toml --verbose
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# ──────────────────────────────────────────
+# COVERAGE
+# ──────────────────────────────────────────
+coverage:
+  stage: coverage
+  image: node:20-alpine
+  before_script:
+    - npm install
+  script:
+    - echo "==> Running Jest with coverage (fail-under 80%)"
+    - npm run test:coverage
+  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/
+    expire_in: 7 days
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'

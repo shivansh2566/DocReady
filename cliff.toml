@@ -1,0 +1,111 @@
+# ============================================================
+# DocReady — cliff.toml
+# Changelog generator config using git-cliff
+# Docs: https://git-cliff.org/docs/configuration
+# ============================================================
+# Generate changelog:  git-cliff --config cliff.toml -o CHANGELOG.md
+# Since last tag:      git-cliff --config cliff.toml --latest -o CHANGELOG.md
+# ============================================================
+
+[changelog]
+# Header shown at the top of the generated CHANGELOG.md
+header = """
+# Changelog — DocReady
+> One visit. Everything ready.
+>
+> All notable changes to DocReady are documented here.
+> Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+"""
+
+# Template for each release section (Tera templating engine)
+body = """
+{% if version %}\
+## [{{ version | trim_start_matches(pat="v") }}] — {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+## [Unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}\
+- {% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ commit.message | upper_first }} ([`{{ commit.id | truncate(length=7, end="") }}`](https://code.swecha.org/yourteam/docready/-/commit/{{ commit.id }}))\
+{% if commit.breaking %} ⚠️ **BREAKING**{% endif %}
+
+{% endfor %}\
+{% endfor %}\n
+"""
+
+# Footer appended after all releases
+footer = """
+---
+*DocReady is a civic technology project built for Indian citizens.*
+*CivicTech Hackathon 2026 · Hyderabad, Telangana*
+"""
+
+# Remove trailing whitespace from generated output
+trim = true
+
+
+# ============================================================
+# GIT — Commit parsing rules
+# ============================================================
+
+[git]
+# Parse commits using Conventional Commits spec
+conventional_commits = true
+
+# Drop commits that don't follow the convention
+filter_unconventional = false
+
+# Split commits on newlines (for multi-line commit messages)
+split_commits = false
+
+# Regex to parse each commit message
+commit_parsers = [
+  # Map conventional commit types to changelog groups
+  { message = "^feat",        group = "✨ Features"          },
+  { message = "^fix",         group = "🐛 Bug Fixes"         },
+  { message = "^data",        group = "📋 Checklist Data"    },
+  { message = "^style",       group = "🎨 UI & Styling"      },
+  { message = "^refac",       group = "♻️ Refactoring"       },
+  { message = "^refactor",    group = "♻️ Refactoring"       },
+  { message = "^docs",        group = "📝 Documentation"     },
+  { message = "^test",        group = "✅ Testing"            },
+  { message = "^perf",        group = "⚡ Performance"        },
+  { message = "^ci",          group = "👷 CI/CD"             },
+  { message = "^chore",       group = "🔧 Chores"            },
+  { message = "^lang",        group = "🌐 Translations"      },
+  { message = "^a11y",        group = "♿ Accessibility"     },
+  { message = "^sec",         group = "🔒 Security"          },
+  # Skip merge commits and automated bumps
+  { message = "^Merge",       skip = true                    },
+  { message = "^bump",        skip = true                    },
+  { message = "^wip",         skip = true                    },
+]
+
+# Filter out commits with these patterns from the changelog
+commit_preprocessors = [
+  # Strip issue/ticket references from message body (keep them clean)
+  { pattern = '\(#(\d+)\)', replace = "([#${1}](https://code.swecha.org/yourteam/docready/-/issues/${1}))" },
+]
+
+# Only include commits that touch these paths (optional — comment out to include all)
+# filter_paths = ["index.html", "style.css", "app.js", "data/", "lang/"]
+
+# Sort commits within a group: "oldest" or "newest"
+sort_commits = "newest"
+
+# Tag pattern to recognise release versions
+tag_pattern = "v[0-9].*"
+
+# Skip tags matching this pattern (e.g. release candidates)
+skip_tags = "v.*-rc.*"
+
+# Whether to protect against breaking changes in the changelog
+protect_breaking_commits = false
+
+# Filter commits that belong to a tag (avoid duplicating in Unreleased)
+filter_commits = false
+
+# Include commits from linked repositories (monorepo use)
+# topo_order = false

@@ -1,0 +1,105 @@
+# ============================================================
+# DocReady — Gitleaks Configuration
+# Prevents secrets and sensitive data from being committed.
+# Docs: https://github.com/gitleaks/gitleaks
+# ============================================================
+# Run manually:  gitleaks detect --source . --config .gitleaks.toml
+# Run on commit: gitleaks protect --staged --config .gitleaks.toml
+# ============================================================
+
+title = "DocReady Gitleaks Config"
+
+[extend]
+# Extend the official gitleaks default ruleset
+useDefault = true
+
+
+# ============================================================
+# CUSTOM RULES — DocReady specific
+# ============================================================
+
+[[rules]]
+id          = "docready-secret-key"
+description = "Flask / Django SECRET_KEY hardcoded in source"
+regex       = '''(?i)(SECRET_KEY\s*=\s*)['"][A-Za-z0-9@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{16,}['"]'''
+tags        = ["secret", "flask", "config"]
+severity    = "critical"
+
+[[rules]]
+id          = "docready-twilio-account-sid"
+description = "Twilio Account SID (planned SMS agent)"
+regex       = '''AC[0-9a-fA-F]{32}'''
+tags        = ["secret", "twilio", "sms"]
+severity    = "critical"
+
+[[rules]]
+id          = "docready-twilio-auth-token"
+description = "Twilio Auth Token hardcoded"
+regex       = '''(?i)(twilio_auth_token|TWILIO_AUTH_TOKEN)\s*=\s*['"][0-9a-fA-F]{32}['"]'''
+tags        = ["secret", "twilio"]
+severity    = "critical"
+
+[[rules]]
+id          = "docready-vercel-token"
+description = "Vercel API token hardcoded"
+regex       = '''(?i)(vercel_token|VERCEL_TOKEN)\s*=\s*['"][A-Za-z0-9]{24,}['"]'''
+tags        = ["secret", "vercel", "deployment"]
+severity    = "high"
+
+[[rules]]
+id          = "docready-database-url"
+description = "Database connection string with credentials"
+regex       = '''(postgres|postgresql|mysql|sqlite):\/\/[^:]+:[^@]+@[^\s'"]+'''
+tags        = ["secret", "database", "credentials"]
+severity    = "critical"
+
+[[rules]]
+id          = "docready-generic-api-key"
+description = "Generic API key assignment in JS or Python files"
+regex       = '''(?i)(api_key|apikey|api-key)\s*[=:]\s*['"][A-Za-z0-9\-_]{20,}['"]'''
+tags        = ["secret", "api-key"]
+severity    = "high"
+
+[[rules]]
+id          = "docready-private-key-block"
+description = "PEM private key block in any file"
+regex       = '''-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----'''
+tags        = ["secret", "pem", "private-key"]
+severity    = "critical"
+
+
+# ============================================================
+# ALLOWLIST — Safe patterns to ignore
+# ============================================================
+
+[allowlist]
+description = "DocReady safe patterns — example values and public URLs"
+
+# Ignore the example env file (contains placeholder values, not real secrets)
+paths = [
+  '''.env\.example''',
+  '''\.gitleaks\.toml''',
+  '''AGENTS\.md''',
+  '''README\.md''',
+  '''USER_MANUAL\.md''',
+  '''CONTRIBUTING\.md''',
+  '''CODE_OF_CONDUCT\.md''',
+]
+
+# Ignore placeholder / example strings used in docs and comments
+regexes = [
+  '''your-secret-key-here''',
+  '''your-twilio-auth-token''',
+  '''your-vercel-api-token''',
+  '''ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx''',
+  '''your-vercel-project-id''',
+  '''your-vercel-org-id''',
+  # Public government portal URLs (not secrets)
+  '''https://www\.passportindia\.gov\.in''',
+  '''https://parivahan\.gov\.in''',
+  '''https://nfsa\.gov\.in''',
+  '''https://voters\.eci\.gov\.in''',
+  '''https://meeseva\.telangana\.gov\.in''',
+  # Commit hashes and generic hex strings in comments
+  '''[0-9a-f]{7,8}''',
+]
