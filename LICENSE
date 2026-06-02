@@ -1,0 +1,64 @@
+GNU AFFERO GENERAL PUBLIC LICENSE
+Version 3, 19 November 2007
+
+DocReady — Know Exactly What to Carry Before Your Government Visit
+Copyright (c) 2026 DocReady Team — Sohan, Shivansh, Ashish
+CivicTech Hackathon 2026, Hyderabad, Telangana, India
+https://doc-ready.vercel.app/
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+-------------------------------------------------------------------------------
+
+ADDITIONAL TERMS UNDER SECTION 7 OF THE GNU AFFERO GENERAL PUBLIC LICENSE
+
+As permitted under Section 7 of the AGPLv3, the following additional terms
+apply to this software:
+
+  a) You must retain, in any modified version of this software, a prominent
+     notice that the work has been modified, along with the date of
+     modification.
+
+  b) You must preserve all copyright notices, author attributions, and the
+     project URL (https://doc-ready.vercel.app/) in any distributed or
+     deployed version of this software, including network-interactive use.
+
+  c) If you deploy a modified version of this software over a network, you
+     must make the complete corresponding source code of your modified
+     version available to users of that network service, under the terms of
+     this license.
+
+-------------------------------------------------------------------------------
+
+IMPORTANT NOTICE REGARDING GOVERNMENT DATA
+
+The document checklists, requirements, and portal links included in this
+software are compiled from publicly available official Indian government
+sources for citizen guidance purposes only. This data is:
+
+  - Not guaranteed to be current, complete, or applicable to every situation.
+  - Subject to change by the relevant government departments at any time.
+  - Provided as general guidance only — not legal or official advice.
+
+DocReady is an independent civic technology tool. It is NOT affiliated with,
+endorsed by, or operated by any Indian government department, ministry, or
+statutory body (including but not limited to MEA, MoRTH, MoCA, or ECI).
+
+Citizens must always verify document requirements on the official government
+portal before visiting any government office.
+
+-------------------------------------------------------------------------------
+
+The full text of the GNU Affero General Public License v3 is available at:
+https://www.gnu.org/licenses/agpl-3.0.txt

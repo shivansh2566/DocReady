@@ -1,0 +1,133 @@
+# ============================================================
+# DocReady — .dockerignore
+# Keeps Docker images lean, fast, and safe.
+# Files listed here are excluded from the Docker build context.
+# ============================================================
+
+
+# ------------------------------------------------------------
+# Version control
+# ------------------------------------------------------------
+.git
+.gitignore
+.gitattributes
+.gitmodules
+
+
+# ------------------------------------------------------------
+# Environment & secrets — NEVER ship these in an image
+# ------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+secrets/
+
+
+# ------------------------------------------------------------
+# Node / JavaScript development artifacts
+# ------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn
+package-lock.json
+yarn.lock
+.eslintcache
+.parcelcache
+
+
+# ------------------------------------------------------------
+# Python / Flask development artifacts (future backend)
+# ------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+*.log
+scripts/
+
+
+# ------------------------------------------------------------
+# Android / Capacitor build artifacts
+# ------------------------------------------------------------
+android/
+ios/
+.capacitor/
+capacitor.config.json
+
+
+# ------------------------------------------------------------
+# Documentation (not needed in the runtime image)
+# ------------------------------------------------------------
+README.md
+CONTRIBUTING.md
+AGENTS.md
+USER_MANUAL.md
+CODE_OF_CONDUCT.md
+docs/
+
+
+# ------------------------------------------------------------
+# IDE and editor config
+# ------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
+.editorconfig
+
+
+# ------------------------------------------------------------
+# Test files
+# ------------------------------------------------------------
+tests/
+test/
+*.test.js
+*.spec.js
+coverage/
+
+
+# ------------------------------------------------------------
+# CI / CD config (not needed inside the image)
+# ------------------------------------------------------------
+.github/
+.gitlab-ci.yml
+.drone.yml
+Jenkinsfile
+
+
+# ------------------------------------------------------------
+# Docker files themselves (no need to nest them)
+# ------------------------------------------------------------
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+
+# ------------------------------------------------------------
+# Miscellaneous
+# ------------------------------------------------------------
+*.zip
+*.tar.gz
+*.bak
+*.tmp
+tmp/
+temp/
