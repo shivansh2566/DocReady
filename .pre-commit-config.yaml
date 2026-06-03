@@ -42,10 +42,6 @@ repos:
     hooks:
       - id: prettier
         files: '\.(html|css|js|json)$'
-        args:
-          - --tab-width=2
-          - --single-quote=false
-          - --print-width=100
 
   # ── ESLint — JS quality ───────────────────────────────────
   - repo: https://github.com/pre-commit/mirrors-eslint
